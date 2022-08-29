@@ -40,8 +40,8 @@ window.addEventListener('load', function(){
             this.frameX = 0;
             this.frameY = 0;
             this.speed = 0;
-            this.vy = 0;
-            this.gravity = 2;
+            this.vy = 0; //velocity y
+            this.gravity = 0.41;
         }
          draw(context) {
             context.fillStyle = 'white';
@@ -54,8 +54,8 @@ window.addEventListener('load', function(){
                 this.speed = 5;  //finds key in keys array
             } else if (input.keys.indexOf('a') > -1) {
                 this.speed = -5;
-            } else if (input.keys.indexOf('w') > -1) {  //can't find a way to make this spacebar instead of w
-                this.vy -= 5;
+            } else if (input.keys.indexOf('w') > -1 && this.ground()) {  //can't find a way to make this spacebar instead of w
+                this.vy -= 20;
             } else {
                 this.speed = 0;
             }
@@ -65,9 +65,11 @@ window.addEventListener('load', function(){
             //verticle movement
             this.y += this.vy;
             if(!this.ground()) {
-                this.vy += this.gravity;
+                this.vy += this.gravity; //player can't go below ground
+                this.frameY = 1; //sprite animation for jump
             } else {
                 this.vy = 0;
+                this.frameY = 0; //sprite animation for when player lands
             }
             if(this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height
         }
@@ -77,7 +79,25 @@ window.addEventListener('load', function(){
     }
 
     class Background {
-
+        constructor(gameWidth, gameHeight) {
+            //class properties
+            this.gameWidth = gameWidth;
+            this.gameHeight = gameHeight;
+            this.image = document.getElementById('backgroundImage');
+            this.x = 0;
+            this.y = 0; 
+            this.width = 2400; //image width
+            this.height = 720; //image height
+            this.speed = 3;
+        }
+        draw(context) {
+            context.drawImage(this.image, this.x, this.y, this.width, this.height); //draw same image twice
+            context.drawImage(this.image, this.x + this.width - this.speed, this.y, this.width, this.height);
+        }
+        update() {
+            this.x -= this.speed;
+            if(this.x < 0 - this.width) this.x = 0;  //if background scrolls ofscreen set its x back to 0
+        }
     }
     class Enemy {
 
@@ -91,9 +111,12 @@ window.addEventListener('load', function(){
 
     const input = new InputHandler();  //invokes key event listeners
     const player = new Player(canvas.width, canvas.height);
+    const background = new Background(canvas.width, canvas.height);
 
     function animate(){
         ctx.clearRect(0,0,canvas.width, canvas.height);
+        background.draw(ctx); //draws background before player
+        background.update();
         player.draw(ctx);
         player.update(input);
         requestAnimationFrame(animate); //endless animation loop

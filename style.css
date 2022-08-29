@@ -13,3 +13,7 @@ body {
 #playerImage, #backgroundImage, #enemyImage1 {
     display: none;
 }
+div {
+    z-index: 1;
+    margin: 0;
+}
