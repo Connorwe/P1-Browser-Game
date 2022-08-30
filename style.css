@@ -7,13 +7,18 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%,-50%);
-    border: 5px solid white;
+    transform: translate(-54%,-50%);
+    border: 5px solid black;
+    z-index: 2;
 }
+
 #playerImage, #backgroundImage, #enemyImage1 {
     display: none;
 }
-div {
-    z-index: 1;
-    margin: 0;
+
+
+
+#lightningbolt-bg {
+    margin-top: -5;
 }
+

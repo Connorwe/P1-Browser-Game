@@ -1,27 +1,26 @@
+
+//Some code and code ideas from Franks laboratory Youtube channel https://www.youtube.com/c/Frankslaboratory
+//Also ideas from https://www.youtube.com/c/ChrisCourses
+
+
 window.addEventListener('load', function(){
     const canvas = document.getElementById('canvas1');
     const ctx = canvas.getContext('2d');       //ctx means context
-    canvas.width = 800;
-    canvas.height = 720;
+    canvas.width = 950;
+    canvas.height = 740;
 
     class InputHandler {
         constructor() {
             this.keys = [];
             window.addEventListener('keydown', e =>{   //used arrow function 
-                if((e.key === 's'  
-                || e.key === 'w' 
-                || e.key === 'a' 
-                || e.key === 'd') 
-                && this.keys.indexOf(e.key) === -1) { //if key is pushed it is consolelogged and added to array
-                    this.keys.push(e.key);
+                if((e.key === 's'  || e.key === 'w' || e.key === 'a' || e.key === 'd') 
+                && this.keys.indexOf(e.key) === -1) { //if key is pushed it is added to array
+                    this.keys.push(e.key); //push() adds elements to array and returns the new length of the array .keys
                 }
-            });
+            }); //indexOf() returns the position of the first specified character in the array 
 
             window.addEventListener('keyup', e =>{    
-                if(e.key === 's'  
-                || e.key === 'w' 
-                || e.key === 'a' 
-                || e.key === 'd') {
+                if(e.key === 's'  || e.key === 'w' || e.key === 'a' || e.key === 'd') {
                     this.keys.splice(this.keys.indexOf(e.key), 1); //if key is released it is taken away from the array using splice
                 }
             });
@@ -43,11 +42,7 @@ window.addEventListener('load', function(){
             this.vy = 0; //velocity y
             this.gravity = 0.41;
         }
-         draw(context) {
-            context.fillStyle = 'white';
-            context.fillRect(this.x, this.y, this.width, this.height);
-            context.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
-        }
+
         update(input) {
             this.x += this.speed;
             if(input.keys.indexOf('d') > -1) {
@@ -76,23 +71,28 @@ window.addEventListener('load', function(){
         ground() {
             return this.y >= this.gameHeight - this.height;
         }
+        draw(context) {
+            context.fillStyle = 'white';
+            context.fillRect(this.x, this.y, this.width, this.height);
+            context.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
+        }
     }
 
     class Background {
-        constructor(gameWidth, gameHeight) {
+        constructor() {
             //class properties
-            this.gameWidth = gameWidth;
-            this.gameHeight = gameHeight;
-            this.image = document.getElementById('backgroundImage');
-            this.x = 0;
-            this.y = 0; 
+            this.gameWidth 
+            this.gameHeight
             this.width = 2400; //image width
-            this.height = 720; //image height
-            this.speed = 3;
+            this.height = 820; //image height
+            this.image = document.getElementById('backgroundImage'); 
+            this.x = 0;
+            this.y = 0;
+            this.speed = 2;
         }
         draw(context) {
             context.drawImage(this.image, this.x, this.y, this.width, this.height); //draw same image twice
-            context.drawImage(this.image, this.x + this.width - this.speed, this.y, this.width, this.height);
+            context.drawImage(this.image, this.x + this.width - 1, this.y, this.width, this.height);
         }
         update() {
             this.x -= this.speed;
