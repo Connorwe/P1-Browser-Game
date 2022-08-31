@@ -37,8 +37,8 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
             this.x = 0;
             this.y = this.gameHeight - this.height;
             this.image = document.getElementById('playerImage');
-            this.frameX = 0;
-            this.frameY = 0;
+            this.frameX = 0; //sprite sheet frames
+            this.frameY = 0; //sprite sheet frames
             this.speed = 0;
             this.vy = 0; //velocity y
             this.gravity = 0.41;
@@ -70,7 +70,7 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
             if(this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height
         }
         ground() {
-            return this.y >= this.gameHeight - this.height;
+            return this.y >= this.gameHeight - this.height -60;
         }
         draw(context) {
             //context.fillStyle = 'white';
@@ -93,7 +93,7 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
         }
         draw(context) {   //draw method has context as an argument
             context.drawImage(this.image, this.x, this.y, this.width, this.height); //draw same image twice
-            context.drawImage(this.image, this.x + this.width - 1, this.y, this.width, this.height);
+            context.drawImage(this.image, this.x + this.width - this.speed, this.y, this.width, this.height);
         }
         update() {
             this.x -= this.speed;
@@ -108,7 +108,7 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
         this.height = 119;
         this.image = document.getElementById('enemyImage');  //this loads image so we can draw it later with .drawImage method
         this.x = this.gameWidth
-        this.y = this.gameHeight - this.height;
+        this.y = this.gameHeight - this.height -80;
         this.speed = 2;
         }
         draw(context) {     //draw method has context as an argument

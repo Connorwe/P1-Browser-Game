@@ -1,6 +1,7 @@
 body {
     background: black;
     overflow: hidden;
+    z-index: 1;
 }
 
 #canvas1 {
@@ -13,6 +14,7 @@ body {
 #playerImage, #backgroundImage, #enemyImage1 {
     display: none;
 }
+
 
 
 
