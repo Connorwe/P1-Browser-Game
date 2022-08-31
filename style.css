@@ -8,8 +8,6 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-54%,-50%);
-    border: 5px solid black;
-    z-index: 2;
 }
 
 #playerImage, #backgroundImage, #enemyImage1 {
@@ -18,7 +16,4 @@ body {
 
 
 
-#lightningbolt-bg {
-    margin-top: -5;
-}
 

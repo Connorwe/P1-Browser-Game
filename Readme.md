@@ -11,3 +11,9 @@ Use a to move left, d to move right, and w to jump
 <!-- Credits -->
 
 Assets from https://bevouliin.com/
+
+<!-- TODO -->
+
+-Make coins that player can grab and store them in browser localStorage
+-create start menu that works in GitHub
+-create win/loss scenarios
