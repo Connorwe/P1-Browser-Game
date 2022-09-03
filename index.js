@@ -10,8 +10,12 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
     canvas.height = 740;
     let enemies = [];
     let score = 0;
+    let hello = 'Sewer Rat'; //name of game
+    //let sideMsg = 'make sure to jump out of sewer before the cat eats you'
+    //let coins = 0; 
+    let gameOver = false;
 
-    class InputHandler {   //InputHandler class converts user keystrokes into concrete actions, takes care of action repitition as well
+    class InputHandler {  //InputHandler class converts user keystrokes into concrete actions, takes care of action repitition as well
         constructor() {
             this.keys = [];
             window.addEventListener('keydown', e =>{   //used arrow function 
@@ -50,7 +54,17 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
 
         }
 
-        update(input, deltaTime) {      //pass deltaTime in update function at bottom do they read each other
+        update(input, deltaTime, enemies) {      //pass deltaTime in update method at bottom do they read each other
+            // *Collison Detection
+            enemies.forEach(enemy => {  //comparing radius of circle one 'player' to radius of circle 2 'enemy'
+                const distanceX = enemy.x - this.x;   // *finding the hypotenuse of right triangle created by distanceX and distanceY
+                const distanceY = enemy.y - this.y;   // if distance is less than both radai added together then player is colliding
+                const distance = Math.sqrt(distanceX*distanceX + distanceY*distanceY); //sqrt is square root //dx^2 + dy^2
+                if(distance < enemy.width/2 + this.width/2) {
+                    gameOver = true;  
+                } // *if distance between centerpoint of player circle and centerpoint of enemy circle is less than radius of player circle plus radius of enemy circle then there is a collision and game reset 
+            });
+            // *Sprite Animatiion
             if(this.frameTimer > this.frameInterval) {
                 if(this.frameX >= this.maxFrame) this.frameX = 0;  //resets frames for sprite animation once maxFrame is reached
                 else this.frameX++; //adds frames
@@ -58,7 +72,7 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
             } else {
                 this.frameTimer += deltaTime;  
             }
-            // Keys
+            // *Keys
             this.x += this.speed;
             if(input.keys.indexOf('d') > -1) {
                 this.speed = 5;  //finds key in keys array
@@ -69,10 +83,10 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
             } else {
                 this.speed = 0;
             }
-            //horizontal movement
+            // *Horizontal Movement
             if(this.x < 0) this.x = 0;  //stops player from going off screen on left
             else if(this.x > this.gameWidth - this.width) this.x = this.gameWidth - this.width  //stops player from moving right off screen
-            //verticle movement
+            // *Verticle movement
             this.y += this.vy;
             if(!this.ground()) {
                 this.vy += this.gravity; //player can't go below ground
@@ -85,19 +99,22 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
             }
             if(this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height
         }
+
         ground() {
             return this.y >= this.gameHeight - this.height -88; // where player is at once he jumps out of the sewer and lands on platform
         }
-        draw(context) {
-            //context.fillStyle = 'white';
-            //context.fillRect(this.x, this.y, this.width, this.height);
+
+        //drawn collision detection for player created with circles
+        draw(context) { //refer to enemy class draw method for explanation on circle hitbox
+            context.beginPath();
+            context.arc(this.x + this.width/2, this.y + this.height/2, this.width/2, 0, Math.PI * 2);
+            context.stroke();
             context.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
         }
     }
 
     class Background {
         constructor() {
-            //class properties
             this.gameWidth 
             this.gameHeight
             this.width = 2400; //image width
@@ -116,7 +133,7 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
             if(this.x < 0 - this.width) this.x = 0;  //if background scrolls ofscreen set its x back to 0
         }
     }
-    class Enemy {       //can't figure out how to make a spite sheet for the cat
+    class Enemy {   //can't figure out how to make a spite sheet for the cat
         constructor(gameWidth, gameHeight) {
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
@@ -128,8 +145,11 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
         this.speed = 2;
         this.toBeDeleted = false;
         }
-        draw(context) {     //draw method has context as an argument
-            context.strokeRect(this.x, this.y, this.width, this.height);
+        draw(context) { //draw method has context as an argument
+            //drawn collision detection for cat created with circles
+            context.beginPath(); //resets current path so line is only drawn once and not lagging page
+            context.arc(this.x + this.width/2, this.y + this.height/2, this.width/2, 0, Math.PI * 2);
+            context.stroke(); //invokes previous and draws hitbox
             context.drawImage(this.image, this.x, this.y, this.width, this.height)  //context.drawImage is built into javascript to draw and load images or videos onto canvas
         } 
         update() {
@@ -142,43 +162,54 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
     }
  
     function handleEnemies(deltaTime){
-        if(enemyTimer > enemyInterval + randomInterval) {    //if enemyTimer is greater than enemyInterval + random push new enemy into the enem array
+        if(enemyTimer > enemyInterval + randomInterval) {    //if enemyTimer is greater than enemyInterval + random push new enemy into the enemy array
         enemies.push(new Enemy(canvas.width, canvas.height));
-        console.log(enemies);
         randomInterval = Math.random() * 3000 + 500;
-        enemyTimer = 0;  //reset back to zero after push
+        enemyTimer = 0;  //reset timer back to zero after push
         } else {
             enemyTimer += deltaTime; //keeps adding deltaTime to enemyTimer untill limit is reached
         }
-        enemies.forEach(enemy => {      //forEach calls function for each element in array
+        enemies.forEach(enemy => {  //forEach calls function for each element in array
             enemy.draw(ctx);
             enemy.update();
         })
         enemies = enemies.filter(enemy => !enemy.toBeDeleted); {  //filter creates a new array for all elements that pass the test created by the function
         }
     }
+
+    // *On screen Text 
     function displayScoreText(context) {  //used to display score defined in line 12
-        context.font = '40px Helvetica'
+        context.font = '35px Helvetica' //TODO: change font if possible
         context.fillStyle = 'black'; //shadow
-        context.fillText('Score: ' + score, 20, 50);
+        context.fillText('Score: ' + score, 10, 43);
         context.fillStyle = 'white'; //score
-        context.fillText('Score: ' + score, 23, 53);
+        context.fillText('Score: ' + score, 13, 46);
+        //Name of Game
+        context.font = '45px Helvetica' 
+        context.fillStyle = 'black'; //shadow
+        context.fillText(hello,  388, 50);
+        context.fillStyle = 'lightgreen'; //score
+        context.fillText(hello,  385, 52);
+        //Side Message
+        // context.font = '15px Helvetica' 
+        // context.fillStyle = 'white'; //score
+        // context.fillText(sideMsg,  0, 70);
     }
 
     function getCoin() {  //TODO: try to make player able to pick up coins and track amount of coins collected.
 
     }
 
-    function displayCoinText(context) {
-        context.font = '40px Helvetica'
-        context.fillStyle = 'black'; //shadow
-        context.fillText('Coins: ' +  777, 50); //find a way to add coins
-        context.fillStyle = 'yellow'; //coins
-        context.fillText('Coins: ' +  780, 53);
-    }
+    // function displayCoinText(context) {
+    //     context.font = '40px Helvetica'
+    //     context.fillStyle = 'black'; //shadow
+    //     context.fillText('Coins: ' +  777, 50); //find a way to add coins
+    //     context.fillStyle = 'yellow'; //coins
+    //     context.fillText('Coins: ' +  780, 53);
+    // }
 
     const input = new InputHandler();  //invokes key event listeners            
-    const player = new Player(canvas.width, canvas.height);                 //const are in order from top to bottom
+    const player = new Player(canvas.width, canvas.height);  //const are in order from top to bottom
     const background = new Background(canvas.width, canvas.height);
 
     let lastTime = 0;  //holds timestamp from previous animation frame
@@ -191,11 +222,12 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
         lastTime = timeStamp; // gets value of timeStamp from previous loop so it can loop again 
         ctx.clearRect(0,0,canvas.width, canvas.height);
         background.draw(ctx); //draws background before player
-        //background.update();
+        background.update();
         player.draw(ctx);
-        player.update(input, deltaTime);  
+        player.update(input, deltaTime, enemies);  
         handleEnemies(deltaTime);
         displayScoreText(ctx);
+        if(!gameOver) //keep running game untill gameOver is equal to true on line 63
         requestAnimationFrame(animate); //endless animation loop, requestAnimationFrame automatically generates a timeStamp and passes it as an argument to the function it calls
     }
     animate(0);  //passed 0 because it doesnt have requestAnimationFrame to generate timeStamp automatically
