@@ -1,6 +1,6 @@
 
-//Some code and code ideas from Franks laboratory Youtube channel https://www.youtube.com/c/Frankslaboratory
-//Also ideas from https://www.youtube.com/c/ChrisCourses
+// *Some code and code ideas from Franks laboratory Youtube channel https://www.youtube.com/c/Frankslaboratory
+// *Also ideas from https://www.youtube.com/c/ChrisCourses
 
 //Canvas setup
 window.addEventListener('load', function(){  //'load' event is fired once page has finished loading resources unlike 'ContentLoaded' which fires as soon as page DOM has loaded
@@ -9,6 +9,7 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
     canvas.width = 950;
     canvas.height = 740;
     let enemies = [];
+    let score = 0;
 
     class InputHandler {   //InputHandler class converts user keystrokes into concrete actions, takes care of action repitition as well
         constructor() {
@@ -32,19 +33,32 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
          constructor(gameWidth, gameHeight) {
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
-            this.width = 150;
-            this.height = 150
+            this.width = 145;
+            this.height = 145;
             this.x = 0;
             this.y = this.gameHeight - this.height;
             this.image = document.getElementById('playerImage');
             this.frameX = 0; //sprite sheet frames
             this.frameY = 0; //sprite sheet frames
+            this.maxFrame = 8
             this.speed = 0;
             this.vy = 0; //velocity y
             this.gravity = 0.41;
+            this.frameTimer = 0;
+            this.fps = 20;
+            this.frameInterval = 1000/this.fps;
+
         }
 
-        update(input) {
+        update(input, deltaTime) {      //pass deltaTime in update function at bottom do they read each other
+            if(this.frameTimer > this.frameInterval) {
+                if(this.frameX >= this.maxFrame) this.frameX = 0;  //resets frames for sprite animation once maxFrame is reached
+                else this.frameX++; //adds frames
+                this.frameTimer = 0; //after timer goes back to 0
+            } else {
+                this.frameTimer += deltaTime;  
+            }
+            // Keys
             this.x += this.speed;
             if(input.keys.indexOf('d') > -1) {
                 this.speed = 5;  //finds key in keys array
@@ -62,15 +76,17 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
             this.y += this.vy;
             if(!this.ground()) {
                 this.vy += this.gravity; //player can't go below ground
+                this.maxFrame = 5;
                 this.frameY = 1; //sprite animation for jump
             } else {
                 this.vy = 0;
+                this.maxFrame = 8;
                 this.frameY = 0; //sprite animation for when player lands
             }
             if(this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height
         }
         ground() {
-            return this.y >= this.gameHeight - this.height -60;
+            return this.y >= this.gameHeight - this.height -88; // where player is at once he jumps out of the sewer and lands on platform
         }
         draw(context) {
             //context.fillStyle = 'white';
@@ -100,7 +116,7 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
             if(this.x < 0 - this.width) this.x = 0;  //if background scrolls ofscreen set its x back to 0
         }
     }
-    class Enemy {       //can't figure out how to make a spite sheet of the cat
+    class Enemy {       //can't figure out how to make a spite sheet for the cat
         constructor(gameWidth, gameHeight) {
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
@@ -110,19 +126,26 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
         this.x = this.gameWidth
         this.y = this.gameHeight - this.height -80;
         this.speed = 2;
+        this.toBeDeleted = false;
         }
         draw(context) {     //draw method has context as an argument
+            context.strokeRect(this.x, this.y, this.width, this.height);
             context.drawImage(this.image, this.x, this.y, this.width, this.height)  //context.drawImage is built into javascript to draw and load images or videos onto canvas
         } 
         update() {
             this.x -= this.speed;
+            if(this.x < 0 - this.width) { 
+                this.toBeDeleted = true; //once cat goes off screen to the left it can be deleted
+                score++;    //increase score every time enemy moves off screen if player avoid enemy
+            }
         }
     }
  
     function handleEnemies(deltaTime){
         if(enemyTimer > enemyInterval + randomInterval) {    //if enemyTimer is greater than enemyInterval + random push new enemy into the enem array
         enemies.push(new Enemy(canvas.width, canvas.height));
-        randomInterval = Math.random() * 5000 + 500;
+        console.log(enemies);
+        randomInterval = Math.random() * 3000 + 500;
         enemyTimer = 0;  //reset back to zero after push
         } else {
             enemyTimer += deltaTime; //keeps adding deltaTime to enemyTimer untill limit is reached
@@ -131,9 +154,27 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
             enemy.draw(ctx);
             enemy.update();
         })
+        enemies = enemies.filter(enemy => !enemy.toBeDeleted); {  //filter creates a new array for all elements that pass the test created by the function
+        }
     }
-    function displayStatusText(){
+    function displayScoreText(context) {  //used to display score defined in line 12
+        context.font = '40px Helvetica'
+        context.fillStyle = 'black'; //shadow
+        context.fillText('Score: ' + score, 20, 50);
+        context.fillStyle = 'white'; //score
+        context.fillText('Score: ' + score, 23, 53);
+    }
 
+    function getCoin() {  //TODO: try to make player able to pick up coins and track amount of coins collected.
+
+    }
+
+    function displayCoinText(context) {
+        context.font = '40px Helvetica'
+        context.fillStyle = 'black'; //shadow
+        context.fillText('Coins: ' +  777, 50); //find a way to add coins
+        context.fillStyle = 'yellow'; //coins
+        context.fillText('Coins: ' +  780, 53);
     }
 
     const input = new InputHandler();  //invokes key event listeners            
@@ -143,17 +184,18 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
     let lastTime = 0;  //holds timestamp from previous animation frame
     let enemyTimer = 0;  //counts miliseconds from 0 to a certain limit then triggers itself and resets back to zero
     let enemyInterval = 1000;  //value for time limit in enemyTimer, adds new enemy every 1000 miliseconds
-    let randomInterval = Math.random() * 5000 + 500; //random milisecond that enemy will come instead of predictable timing
+    let randomInterval = Math.random() * 3000 + 500; //random milisecond that enemy will come instead of predictable timing
 
     function animate(timeStamp){
         const deltaTime = timeStamp - lastTime;  //difference in miliseconds between timeStamp loop and lastTime loop
         lastTime = timeStamp; // gets value of timeStamp from previous loop so it can loop again 
         ctx.clearRect(0,0,canvas.width, canvas.height);
         background.draw(ctx); //draws background before player
-        background.update();
+        //background.update();
         player.draw(ctx);
-        player.update(input);  
+        player.update(input, deltaTime);  
         handleEnemies(deltaTime);
+        displayScoreText(ctx);
         requestAnimationFrame(animate); //endless animation loop, requestAnimationFrame automatically generates a timeStamp and passes it as an argument to the function it calls
     }
     animate(0);  //passed 0 because it doesnt have requestAnimationFrame to generate timeStamp automatically
