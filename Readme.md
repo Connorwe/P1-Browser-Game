@@ -17,5 +17,6 @@ Assets from https://bevouliin.com/
 -Make coins that player can grab and store them in browser localStorage
 -create start menu that works in GitHub
 -create win/loss scenarios
+-make game restartable
 
 ## Name Of Game: SEWER RAT
