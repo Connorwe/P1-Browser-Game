@@ -1,3 +1,9 @@
+* {
+    margin: 0;
+    padding: 0;     /* makes width and height the same on different divices */
+    box-sizing: border-box;
+}
+
 body {
     background: black;
     overflow: hidden;
@@ -9,12 +15,10 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-54%,-50%);
+    max-width: 100%;   /* makes width and height the same on different divices */
+    max-height: 100%;
 }
 
 #playerImage, #backgroundImage, #enemyImage1 {
     display: none;
 }
-
-
-
-
