@@ -1,32 +1,30 @@
 
-// *Some code and code ideas from Franks laboratory Youtube channel https://www.youtube.com/c/Frankslaboratory
-// *Also ideas from https://www.youtube.com/c/ChrisCourses
+// Some code and code ideas from Franks laboratory Youtube channel https://www.youtube.com/c/Frankslaboratory
+// Also ideas from https://www.youtube.com/c/ChrisCourses
 
-//Canvas setup
+// *Canvas setup
 window.addEventListener('load', function(){  //'load' event is fired once page has finished loading resources unlike 'ContentLoaded' which fires as soon as page DOM has loaded
-    const canvas = document.getElementById('canvas1');
+    const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');       //ctx means context. getContext('2d') gains access to the canvas tags 2d drawing functions
     canvas.width = 950;
     canvas.height = 740;
     let enemies = [];
     let score = 0;
     let hello = 'Sewer Rat'; //name of game
-    //let sideMsg = 'make sure to jump out of sewer before the cat eats you'
-    //let coins = 0;
     let gameOver = false;
 
     class InputHandler {  //InputHandler class converts user keystrokes into concrete actions, takes care of action repitition as well
         constructor() {
             this.keys = [];
             window.addEventListener('keydown', e =>{   //used arrow function 
-                if((e.key === 's'  || e.key === 'w' || e.key === 'a' || e.key === 'd') // || (OR) used with booleans 
+                if((e.key === 'w' || e.key === 'a' || e.key === 'd' || e.key === 's') // || (OR) used with booleans 
                 && this.keys.indexOf(e.key) === -1) { //if key is pushed it is added to array
                     this.keys.push(e.key); //push() adds elements to array and returns the new length of the array .keys
                 } else if(e.key === 'r' && gameOver) restart(); //if gameOver is true restart runs
             }); //indexOf() returns the position of the first specified character in the array 
 
             window.addEventListener('keyup', e =>{    
-                if(e.key === 's'  || e.key === 'w' || e.key === 'a' || e.key === 'd') {
+                if(e.key === 'w' || e.key === 'a' || e.key === 'd' || e.key === 's') {
                     this.keys.splice(this.keys.indexOf(e.key), 1); //if key is released it is taken away from the array using splice
                 }
             });
@@ -47,14 +45,14 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
             this.maxFrame = 8
             this.speed = 0;
             this.vy = 0; //velocity y
-            this.gravity = 0.41;
+            this.gravity = 0.48;
             this.frameTimer = 0;
             this.fps = 20;
             this.frameInterval = 1000/this.fps;
 
         }
 
-        update(input, deltaTime, enemies) {      //pass deltaTime in update method at bottom do they read each other
+        update(input, deltaTime, enemies) {      //pass deltaTime in update method at bottom so they read each other
             // *Collison Detection
             enemies.forEach(enemy => {  //comparing radius of circle one 'player' to radius of circle 2 'enemy'
                 const distanceX = (enemy.x) - (this.x );   // *finding the hypotenuse of right triangle created by distanceX and distanceY
@@ -74,13 +72,13 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
             }
             // *Keys
             this.x += this.speed;
-            if(input.keys.indexOf('d') > -1) {
-                this.speed = 5;  //finds key in keys array
-            } else if (input.keys.indexOf('a') > -1) {
-                this.speed = -5;
-            } else if (input.keys.indexOf('w') > -1 && this.ground()) {  //can't find a way to make this spacebar instead of w
+            if(input.keys.indexOf('w') > -1 && this.ground()) {  //can't find a way to make this spacebar instead of w
                 this.vy -= 17;
-            } else {
+            } else if(input.keys.indexOf('d') > -1) {
+                this.speed = 5;  //finds key in keys array
+            } else if (input.keys.indexOf('a',) > -1) {
+                this.speed = -5;
+            }  else {
                 this.speed = 0;
             }
             // *Horizontal Movement
@@ -221,18 +219,6 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
         gameOver = false;
         animate(0); //starts new animation loop
     }
-
-    function getCoin() {  //TODO: try to make player able to pick up coins and track amount of coins collected.
-
-    }
-
-    // function displayCoinText(context) {
-    //     context.font = '40px Helvetica'
-    //     context.fillStyle = 'black'; //shadow
-    //     context.fillText('Coins: ' +  777, 50); //find a way to add coins
-    //     context.fillStyle = 'yellow'; //coins
-    //     context.fillText('Coins: ' +  780, 53);
-    // }
 
     const input = new InputHandler();  //invokes key event listeners            
     const player = new Player(canvas.width, canvas.height);  //const are in order from top to bottom
