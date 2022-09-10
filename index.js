@@ -35,8 +35,8 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
          constructor(gameWidth, gameHeight) {
             this.gameWidth = gameWidth;
             this.gameHeight = gameHeight;
-            this.width = 145;
-            this.height = 145;
+            this.width = 145; //sprite sheet size
+            this.height = 145; //sprite sheet size
             this.x = 50;
             this.y = this.gameHeight - this.height;
             this.image = document.getElementById('playerImage');
@@ -47,7 +47,7 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
             this.vy = 0; //velocity y
             this.gravity = 0.48;
             this.frameTimer = 0;
-            this.fps = 20;
+            this.fps = 25;
             this.frameInterval = 1000/this.fps;
 
         }
@@ -65,14 +65,14 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
             // *Sprite Animatiion
             if(this.frameTimer > this.frameInterval) {
                 if(this.frameX >= this.maxFrame) this.frameX = 0;  //resets frames for sprite animation once maxFrame is reached
-                else this.frameX++; //adds frames
+                else this.frameX++; //adds frames by 1
                 this.frameTimer = 0; //after timer goes back to 0
             } else {
                 this.frameTimer += deltaTime;  
             }
             // *Keys
             this.x += this.speed;
-            if(input.keys.indexOf('w') > -1 && this.ground()) {  //can't find a way to make this spacebar instead of w
+            if(input.keys.indexOf('w') > -1 && this.ground()) {  
                 this.vy -= 17;
             } else if(input.keys.indexOf('d') > -1) {
                 this.speed = 5;  //finds key in keys array
@@ -86,16 +86,16 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
             else if(this.x > this.gameWidth - this.width) this.x = this.gameWidth - this.width  //stops player from moving right off screen
             // *Verticle movement
             this.y += this.vy;
-            if(!this.ground()) {
-                this.vy += this.gravity; //player can't go below ground
+            if(!this.ground()) { //if ground is false and player is in the air
+                this.vy += this.gravity; 
                 this.maxFrame = 5;
                 this.frameY = 1; //sprite animation for jump
             } else {
-                this.vy = 0;
+                this.vy = 0;  
                 this.maxFrame = 8;
                 this.frameY = 0; //sprite animation for when player lands
             }
-            if(this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height
+            if(this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height  //player can't go below ground
         }
 
         ground() {
@@ -139,13 +139,13 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
             this.x = 0; //restart background x position
         }
     }
-    class Enemy {   //can't figure out how to make a spite sheet for the cat
+    class Enemy {   
         constructor(gameWidth, gameHeight) {
         this.gameWidth = gameWidth;
         this.gameHeight = gameHeight;
         this.width = 160;
         this.height = 119;
-        this.image = document.getElementById('enemyImage');  //this loads image so we can draw it later with .drawImage method
+        this.image = document.getElementById('enemyImage');  
         this.x = this.gameWidth
         this.y = this.gameHeight - this.height -80;
         this.fps = 5;
@@ -169,8 +169,8 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
  
     function handleEnemies(deltaTime){
         if(enemyTimer > enemyInterval + randomInterval) {    //if enemyTimer is greater than enemyInterval + random push new enemy into the enemy array
-        enemies.push(new Enemy(canvas.width, canvas.height));
-        randomInterval = Math.random() * 3000 + 2000;
+        enemies.push(new Enemy(canvas.width, canvas.height)); //creates new instance of enemy class -push()-
+        randomInterval = Math.random() * 3000 + 700;
         enemyTimer = 0;  //reset timer back to zero after push
         } else {
             enemyTimer += deltaTime; //keeps adding deltaTime to enemyTimer untill limit is reached
@@ -186,7 +186,7 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
     // *On screen Text 
     function displayScoreText(context) {  //used to display score defined in line 12
         context.textAlign = 'left'
-        context.font = '35px Helvetica' //TODO: change font if possible
+        context.font = '35px Helvetica' 
         context.fillStyle = 'black'; //shadow
         context.fillText('Score: ' + score, 10, 43);
         context.fillStyle = 'white'; //score
@@ -227,7 +227,7 @@ window.addEventListener('load', function(){  //'load' event is fired once page h
     let lastTime = 0;  //holds timestamp from previous animation frame
     let enemyTimer = 0;  //counts miliseconds from 0 to a certain limit then triggers itself and resets back to zero
     let enemyInterval = 1000;  //value for time limit in enemyTimer, adds new enemy every 1000 miliseconds
-    let randomInterval = Math.random() * 3000 + 2000; //random milisecond that enemy will come instead of predictable timing
+    let randomInterval = Math.random() * 3000 + 700; //random milisecond that enemy will come instead of predictable timing
 
     function animate(timeStamp){
         const deltaTime = timeStamp - lastTime;  //difference in miliseconds between timeStamp loop and lastTime loop
